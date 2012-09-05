@@ -1,5 +1,7 @@
 require 'mkmf'
-create_makefile 'open-temporary'
+have_func("mkstemp", "stdlib.h") and
+have_func("unlink", "unistd.h") and
+create_makefile 'open_temporary'
 
 # 
 # Local Variables:

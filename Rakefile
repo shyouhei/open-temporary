@@ -14,10 +14,10 @@ require 'rake/clean'
 CLEAN.include('ext/**/*{.o,.log,.so}')
 CLOBBER.include('ext/**/Makefile')
 
-soname = 'ext/open-temporary/open-temporary.so'
+soname = 'ext/open_temporary/open_temporary.so'
 
-file soname => Dir.glob('ext/open-temporary/*') do
-	Dir.chdir 'ext/open-temporary' do
+file soname => Dir.glob('ext/open_temporary/*.{rb,c}') do
+	Dir.chdir 'ext/open_temporary' do
 		ruby 'extconf.rb'
 		sh 'make'
 	end
@@ -29,7 +29,7 @@ begin
 	RSpec::Core::RakeTask.new(:spec) do |spec|
 		spec.pattern = FileList['spec/**/*_spec.rb']
 	end
-	task spec: 'ext/open-temporary/open-temporary.so'
+	task spec: soname
 
 	require 'yard'
 	YARD::Rake::YardocTask.new
