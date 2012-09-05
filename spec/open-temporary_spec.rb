@@ -30,6 +30,17 @@ describe File do
       it("can be written") { expect { subject.write("foo") }.to_not raise_error }
       it("can be seeked")  { expect { subject.rewind }.to_not raise_error }
       it("can be read")    { expect { subject.read }.to_not raise_error }
+      context "when passed block" do
+        it "yields" do
+          ex = Exception.new
+          expect do
+            File.open do |f|
+              f.should be_kind_of(File)
+              raise ex
+            end
+          end.to raise_exception(ex)
+        end
+      end
     end
     context "when passed something" do
       subject { File.open IO::NULL }
