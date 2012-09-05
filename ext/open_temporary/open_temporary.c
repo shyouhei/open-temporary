@@ -22,6 +22,7 @@
 #include <ruby.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 static VALUE tmpdir = Qundef;
 static VALUE tmpsuf = Qundef;
@@ -34,6 +35,7 @@ open_temporary(int argc, VALUE* argv, VALUE klass)
     VALUE buf = Qundef;
     VALUE dir = Qundef;
     VALUE suf = Qundef;
+    int   mod = -1;
 
     rb_scan_args(argc, argv, "02", &dir, &suf);
 
@@ -45,16 +47,18 @@ open_temporary(int argc, VALUE* argv, VALUE klass)
 
     buf = rb_sprintf("%s/%sXXXXXX", StringValueCStr(dir), StringValueCStr(suf));
     str = StringValueCStr(buf);
-    fd = mkstemp(str);
-    if (fd == -1) {
+    if ((fd = mkstemp(str)) == -1) {
         rb_sys_fail("mkstemp(3)");
     }
     else if (unlink(str) == -1) {
         /* unlink failed, no way to reclaim */
         rb_sys_fail("unlink(2)");
     }
+    else if ((mod = fcntl(fd, F_GETFL)) == -1) {
+        rb_sys_fail("fcntl(2)");
+    }
     else {
-        return rb_io_fdopen(fd, 0600, str);
+        return rb_io_fdopen(fd, mod, str);
     }
 }
 

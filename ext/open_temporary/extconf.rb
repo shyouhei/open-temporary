@@ -21,6 +21,7 @@
 require 'mkmf'
 have_func("mkstemp", "stdlib.h") and
 have_func("unlink", "unistd.h") and
+have_func("fcntl", "fcntl.h") and
 create_makefile 'open_temporary'
 
 # 
