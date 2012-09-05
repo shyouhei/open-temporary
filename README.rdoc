@@ -1,19 +1,36 @@
-= open-temporary
+= open-temporary the "real file" temporary one.
 
-Description goes here.
+OK, so you dropped into a tempfile pitfall.  Like Rails.
 
-== Contributing to open-temporary
- 
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.
-* Fork the project.
-* Start a feature/bugfix branch.
-* Commit and push until you are happy with your contribution.
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+https://github.com/rails/rails/pull/2068
 
-== Copyright
+Why not just fix the situation so that you can safely dup?
 
-Copyright (c) 2012 Urabe, Shyouhei. See LICENSE.txt for
-further details.
+= How to use it?
 
+You first add
+
+  gem "open-temporary"
+
+to your Gemfile, then from your .rb file,
+
+  require 'open-temporary'
+
+And that's it.  Now you have the "open" method extended, just like
+the open-uri standard library.
+
+  File.open # => gives you a temporary file
+
+This time the null (zero-arity) argument indicates this is a temporary
+file.  You get a REAL instance of File, no proxy, no tweak.  It can be
+dup'ed, it can be used with process forks, and still, you can just
+leave it, and the GC reclaims the whole resources.
+
+= Great!  So why this isn't a standard?
+
+Because it has absolutely zero portability.  The magic behind the
+scene is that we just let your operating system to reclaim what's
+necessary.  That way, the behaviour detail is much much OS specific.
+Especially, this kind of API is not doable on a Windows environment.
+Might not also on Java (not sure).  So this can never be a part of
+gospel ruby.
