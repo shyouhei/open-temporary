@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "open-temporary"
-  s.version = "1.0.0"
+  s.version = "1.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Urabe, Shyouhei"]
-  s.date = "2012-09-05"
+  s.date = "2012-09-06"
   s.description = "A variation of tempfile standard lib, that actually creates a File instance."
   s.email = "shyouhei@ruby-lang.org"
   s.extensions = ["ext/open_temporary/extconf.rb"]
@@ -30,13 +30,14 @@ Gem::Specification.new do |s|
     "ext/open_temporary/extconf.rb",
     "ext/open_temporary/open_temporary.c",
     "lib/open-temporary.rb",
+    "open-temporary.gemspec",
     "spec/open-temporary_spec.rb",
     "spec/spec_helper.rb"
   ]
   s.homepage = "http://github.com/shyouhei/open-temporary"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.22"
+  s.rubygems_version = "1.8.24"
   s.summary = "A variant of Tempfile that makes File instead"
 
   if s.respond_to? :specification_version then
