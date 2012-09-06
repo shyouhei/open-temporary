@@ -23,6 +23,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
+
+#define preserving_errno(stmts) \
+	do {int saved_errno = errno; stmts; errno = saved_errno;} while (0)
 
 static VALUE tmpdir = Qundef;
 static VALUE tmpsuf = Qundef;
@@ -51,10 +55,12 @@ open_temporary(int argc, VALUE* argv, VALUE klass)
         rb_sys_fail("mkstemp(3)");
     }
     else if (unlink(str) == -1) {
+        preserving_errno((void)close(fd));
         /* unlink failed, no way to reclaim */
         rb_sys_fail("unlink(2)");
     }
     else if ((mod = fcntl(fd, F_GETFL)) == -1) {
+        preserving_errno((void)close(fd));
         rb_sys_fail("fcntl(2)");
     }
     else {
