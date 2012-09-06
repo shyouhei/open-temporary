@@ -23,9 +23,26 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
+
+#define preserving_errno(stmts) \
+	do {int saved_errno = errno; stmts; errno = saved_errno;} while (0)
 
 static VALUE tmpdir = Qundef;
 static VALUE tmpsuf = Qundef;
+
+struct fdopen_args {
+    int fd;
+    int mod;
+    const char *str;
+};
+
+static VALUE
+call_fdopen(VALUE args)
+{
+    struct fdopen_args *argp = (struct fdopen_args *)args;
+    return rb_io_fdopen(argp->fd, argp->mod, argp->str);
+}
 
 static VALUE
 open_temporary(int argc, VALUE* argv, VALUE klass)
@@ -41,7 +58,7 @@ open_temporary(int argc, VALUE* argv, VALUE klass)
 
     if (dir == Qnil) dir = tmpdir;
     if (suf == Qnil) suf = tmpsuf;
-    
+
     SafeStringValue(dir);
     SafeStringValue(suf);
 
@@ -51,14 +68,27 @@ open_temporary(int argc, VALUE* argv, VALUE klass)
         rb_sys_fail("mkstemp(3)");
     }
     else if (unlink(str) == -1) {
+        preserving_errno((void)close(fd));
         /* unlink failed, no way to reclaim */
         rb_sys_fail("unlink(2)");
     }
     else if ((mod = fcntl(fd, F_GETFL)) == -1) {
+        preserving_errno((void)close(fd));
         rb_sys_fail("fcntl(2)");
     }
     else {
-        return rb_io_fdopen(fd, mod, str);
+        int state;
+        VALUE io;
+        struct fdopen_args args;
+        args.fd = fd;
+        args.mod = mod;
+        args.str = str;
+        io = rb_protect(call_fdopen, (VALUE)&args, &state);
+        if (state) {
+            (void)close(fd);
+            rb_jump_tag(state);
+        }
+        return io;
     }
 }
 
