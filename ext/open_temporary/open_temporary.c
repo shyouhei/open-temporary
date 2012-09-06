@@ -31,6 +31,19 @@
 static VALUE tmpdir = Qundef;
 static VALUE tmpsuf = Qundef;
 
+struct fdopen_args {
+    int fd;
+    int mod;
+    const char *str;
+};
+
+static VALUE
+call_fdopen(VALUE args)
+{
+    struct fdopen_args *argp = (struct fdopen_args *)args;
+    return rb_io_fdopen(argp->fd, argp->mod, argp->str);
+}
+
 static VALUE
 open_temporary(int argc, VALUE* argv, VALUE klass)
 {
@@ -64,7 +77,18 @@ open_temporary(int argc, VALUE* argv, VALUE klass)
         rb_sys_fail("fcntl(2)");
     }
     else {
-        return rb_io_fdopen(fd, mod, str);
+        int state;
+        VALUE io;
+        struct fdopen_args args;
+        args.fd = fd;
+        args.mod = mod;
+        args.str = str;
+        io = rb_protect(call_fdopen, (VALUE)&args, &state);
+        if (state) {
+            (void)close(fd);
+            rb_jump_tag(state);
+        }
+        return io;
     }
 }
 
