@@ -59,7 +59,7 @@ module Kernel
     else
       File.open
     end
-  end    
+  end
 end
 
 # 
