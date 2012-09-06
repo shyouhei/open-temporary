@@ -41,7 +41,7 @@ open_temporary(int argc, VALUE* argv, VALUE klass)
 
     if (dir == Qnil) dir = tmpdir;
     if (suf == Qnil) suf = tmpsuf;
-    
+
     SafeStringValue(dir);
     SafeStringValue(suf);
 
