@@ -21,45 +21,45 @@
 require 'open_temporary.so'
 
 class File
-  @@open = self.method(:open)
+	@@open = self.method(:open)
 
-  # If non-zero numbers of args are passed, works as it ought.
-  # otherwise creates and opens a temporay file.
-  def self.open(*argv, &block)
-    if argv.size.nonzero?
-      @@open.call(*argv, &block)
-    elsif block_given?
-      begin
-        f = self.open_temporary
-        yield f
-      ensure
-        f.close
-      end
-    else
-      self.open_temporary
-    end
-  end
+	# If non-zero numbers of args are passed, works as it ought.
+	# otherwise creates and opens a temporay file.
+	def self.open(*argv, &block)
+		if argv.size.nonzero?
+			@@open.call(*argv, &block)
+		elsif block_given?
+			begin
+				f = self.open_temporary
+				yield f
+			ensure
+				f.close
+			end
+		else
+			self.open_temporary
+		end
+	end
 end
 
 module Kernel
-  @@open = self.method(:open)
+	@@open = self.method(:open)
 
-  # If non-zero numbers of args are passed, works as it ought.
-  # otherwise creates and opens a temporay file.
-  def open(*argv, &block)
-    if argv.size.nonzero?
-      @@open.call(*argv, &block)
-    elsif block_given?
-      begin
-        f = self.open_temporary
-        yield f
-      ensure
-        f.close
-      end
-    else
-      File.open
-    end
-  end
+	# If non-zero numbers of args are passed, works as it ought.
+	# otherwise creates and opens a temporay file.
+	def open(*argv, &block)
+		if argv.size.nonzero?
+			@@open.call(*argv, &block)
+		elsif block_given?
+			begin
+				f = self.open_temporary
+				yield f
+			ensure
+				f.close
+			end
+		else
+			File.open
+		end
+	end
 end
 
 # 
