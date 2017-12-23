@@ -26,7 +26,7 @@ describe File do
 			subject { File.open }
 			it { should be_kind_of(File) }
 			its(:size) { should be_zero }
-			its(:path) { File.exist?(subject).should be_false }
+			its(:path) { File.exist?(subject).should be_falsy }
 			it("can be written") { expect { subject.write("foo") }.to_not raise_error }
 			it("can be seeked")  { expect { subject.rewind }.to_not raise_error }
 			it("can be read")    { expect { subject.read }.to_not raise_error }
@@ -45,7 +45,7 @@ describe File do
 		context "when passed something" do
 			subject { File.open IO::NULL }
 			it { should be_kind_of(File) }
-			its(:path) { File.exist?(subject).should be_true }
+			its(:path) { File.exist?(subject).should be_truthy }
 		end
 	end
 end

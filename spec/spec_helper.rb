@@ -19,6 +19,7 @@
 # SOFTWARE.
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'ext', 'open_temporary'))
+require 'rspec/its'
 require 'rspec'
 require 'simplecov'
 SimpleCov.start
